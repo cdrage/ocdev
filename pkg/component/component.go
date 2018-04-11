@@ -159,6 +159,16 @@ func Delete(client *occlient.Client, name string) (string, error) {
 }
 
 func SetCurrent(client *occlient.Client, name string) error {
+
+	// Check to see if the component actually exists
+	check, err := doesComponentExist(client, name)
+	if err != nil {
+		return err
+	}
+	if check == false {
+
+	}
+
 	cfg, err := config.New()
 	if err != nil {
 		return errors.Wrapf(err, "unable to set current component %s", name)
@@ -342,4 +352,21 @@ func GetComponentDeploymentConfig(client *occlient.Client, componentName string,
 	}
 
 	return &deploymentConfigs[0], nil
+}
+
+// Checks to see if the component exists by using component.List(client)
+func doesComponentExist(client *occlient.Client, name string) (bool, error) {
+	components, err := List(client)
+
+	if err != nil {
+		return false, errors.Wrapf(err, "unable to retrieve list of components")
+	}
+
+	for _, c := range components {
+		if c.Name == name {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
