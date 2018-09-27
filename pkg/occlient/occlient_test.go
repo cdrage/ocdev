@@ -631,7 +631,7 @@ func TestCreateRoute(t *testing.T) {
 			service:    "mailserver",
 			portNumber: intstr.FromInt(8080),
 			labels: map[string]string{
-				"SLA": "High",
+				"SLA":                              "High",
 				"app.kubernetes.io/component-name": "backend",
 				"app.kubernetes.io/component-type": "python",
 			},
@@ -644,7 +644,7 @@ func TestCreateRoute(t *testing.T) {
 			service:    "blog",
 			portNumber: intstr.FromInt(9100),
 			labels: map[string]string{
-				"SLA": "High",
+				"SLA":                              "High",
 				"app.kubernetes.io/component-name": "backend",
 				"app.kubernetes.io/component-type": "golang",
 			},
@@ -956,7 +956,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				"app.kubernetes.io/component-source-type": "local",
 			},
 			labels: map[string]string{
-				"app": "apptmp",
+				"app":                              "apptmp",
 				"app.kubernetes.io/component-name": "ruby",
 				"app.kubernetes.io/component-type": "ruby",
 				"app.kubernetes.io/name":           "apptmp",
@@ -990,7 +990,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: fmt.Sprintf("%s-s2idata", "wildfly"),
 					Labels: map[string]string{
-						"app": "apptmp",
+						"app":                              "apptmp",
 						"app.kubernetes.io/component-name": "wildfly",
 						"app.kubernetes.io/component-type": "wildfly",
 						"app.kubernetes.io/name":           "apptmp",
@@ -1019,7 +1019,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				"app.kubernetes.io/component-source-type": "local",
 			},
 			labels: map[string]string{
-				"app": "apptmp",
+				"app":                              "apptmp",
 				"app.kubernetes.io/component-name": "ruby",
 				"app.kubernetes.io/component-type": "ruby",
 				"app.kubernetes.io/name":           "apptmp",
@@ -1054,7 +1054,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "wildfly",
 					Labels: map[string]string{
-						"app": "apptmp",
+						"app":                              "apptmp",
 						"app.kubernetes.io/component-name": "wildfly",
 						"app.kubernetes.io/component-type": "wildfly",
 						"app.kubernetes.io/name":           "apptmp",
@@ -1083,7 +1083,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				"app.kubernetes.io/component-source-type": "local",
 			},
 			labels: map[string]string{
-				"app": "apptmp",
+				"app":                              "apptmp",
 				"app.kubernetes.io/component-name": "ruby",
 				"app.kubernetes.io/component-type": "ruby",
 				"app.kubernetes.io/name":           "apptmp",
@@ -1118,7 +1118,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: fmt.Sprintf("%s-s2idata", "wildfly"),
 					Labels: map[string]string{
-						"app": "apptmp",
+						"app":                              "apptmp",
 						"app.kubernetes.io/component-name": "wildfly",
 						"app.kubernetes.io/component-type": "wildfly",
 						"app.kubernetes.io/name":           "apptmp",
@@ -1146,7 +1146,7 @@ func TestSetupForSupervisor(t *testing.T) {
 				"app.kubernetes.io/component-source-type": "local",
 			},
 			labels: map[string]string{
-				"app": "apptmp",
+				"app":                              "apptmp",
 				"app.kubernetes.io/component-name": "ruby",
 				"app.kubernetes.io/component-type": "ruby",
 				"app.kubernetes.io/name":           "apptmp",
@@ -1612,52 +1612,6 @@ func TestUpdateBuildConfig(t *testing.T) {
 		wantErr             bool
 	}{
 		{
-			name:            "git to local with proper parameters",
-			buildConfigName: "nodejs",
-			projectName:     "app",
-			gitUrl:          "",
-			annotations: map[string]string{
-				"app.kubernetes.io/url":                   "file:///temp/nodejs-ex",
-				"app.kubernetes.io/component-source-type": "local",
-			},
-			existingBuildConfig: buildv1.BuildConfig{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "nodejs",
-				},
-				Spec: buildv1.BuildConfigSpec{
-					CommonSpec: buildv1.CommonSpec{
-						Source: buildv1.BuildSource{
-							Git: &buildv1.GitBuildSource{
-								URI: "https://github.com/sclorg/nodejs-ex",
-							},
-							Type: buildv1.BuildSourceGit,
-						},
-					},
-				},
-			},
-			updatedBuildConfig: buildv1.BuildConfig{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "nodejs",
-					Annotations: map[string]string{
-						"app.kubernetes.io/url":                   "file:///temp/nodejs-ex",
-						"app.kubernetes.io/component-source-type": "local",
-					},
-				},
-				Spec: buildv1.BuildConfigSpec{
-					CommonSpec: buildv1.CommonSpec{
-						Source: buildv1.BuildSource{
-							Git: &buildv1.GitBuildSource{
-								URI: bootstrapperURI,
-								Ref: bootstrapperRef,
-							},
-							Type: buildv1.BuildSourceGit,
-						},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
 			name:            "local to git with proper parameters",
 			buildConfigName: "nodejs",
 			projectName:     "app",
@@ -1749,13 +1703,11 @@ func TestUpdateBuildConfig(t *testing.T) {
 
 func TestNewAppS2I(t *testing.T) {
 	type args struct {
-		name         string
-		namespace    string
-		builderImage string
-		gitUrl       string
-		labels       map[string]string
-		annotations  map[string]string
-		inputPorts   []string
+		commonObjectMeta metav1.ObjectMeta
+		namespace        string
+		builderImage     string
+		gitUrl           string
+		inputPorts       []string
 	}
 
 	tests := []struct {
@@ -1767,19 +1719,21 @@ func TestNewAppS2I(t *testing.T) {
 		{
 			name: "case 1: with valid gitUrl",
 			args: args{
-				name:         "ruby",
 				builderImage: "ruby:latest",
 				namespace:    "testing",
 				gitUrl:       "https://github.com/openshift/ruby",
-				labels: map[string]string{
-					"app": "apptmp",
-					"app.kubernetes.io/component-name": "ruby",
-					"app.kubernetes.io/component-type": "ruby",
-					"app.kubernetes.io/name":           "apptmp",
-				},
-				annotations: map[string]string{
-					"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
-					"app.kubernetes.io/component-source-type": "git",
+				commonObjectMeta: metav1.ObjectMeta{
+					Name: "ruby",
+					Labels: map[string]string{
+						"app":                              "apptmp",
+						"app.kubernetes.io/component-name": "ruby",
+						"app.kubernetes.io/component-type": "ruby",
+						"app.kubernetes.io/name":           "apptmp",
+					},
+					Annotations: map[string]string{
+						"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
+						"app.kubernetes.io/component-source-type": "git",
+					},
 				},
 			},
 			wantedService: map[int32]corev1.Protocol{
@@ -1790,19 +1744,21 @@ func TestNewAppS2I(t *testing.T) {
 		{
 			name: "case 2 : binary buildSource with gitUrl empty",
 			args: args{
-				name:         "ruby",
 				builderImage: "ruby:latest",
 				namespace:    "testing",
 				gitUrl:       "",
-				labels: map[string]string{
-					"app": "apptmp",
-					"app.kubernetes.io/component-name": "ruby",
-					"app.kubernetes.io/component-type": "ruby",
-					"app.kubernetes.io/name":           "apptmp",
-				},
-				annotations: map[string]string{
-					"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
-					"app.kubernetes.io/component-source-type": "git",
+				commonObjectMeta: metav1.ObjectMeta{
+					Name: "ruby",
+					Labels: map[string]string{
+						"app":                              "apptmp",
+						"app.kubernetes.io/component-name": "ruby",
+						"app.kubernetes.io/component-type": "ruby",
+						"app.kubernetes.io/name":           "apptmp",
+					},
+					Annotations: map[string]string{
+						"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
+						"app.kubernetes.io/component-source-type": "git",
+					},
 				},
 				inputPorts: []string{"8081/tcp", "9100/udp"},
 			},
@@ -1815,19 +1771,21 @@ func TestNewAppS2I(t *testing.T) {
 		{
 			name: "case 3 : with a invalid port protocol",
 			args: args{
-				name:         "ruby",
 				builderImage: "ruby:latest",
 				namespace:    "testing",
 				gitUrl:       "https://github.com/openshift/ruby",
-				labels: map[string]string{
-					"app": "apptmp",
-					"app.kubernetes.io/component-name": "ruby",
-					"app.kubernetes.io/component-type": "ruby",
-					"app.kubernetes.io/name":           "apptmp",
-				},
-				annotations: map[string]string{
-					"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
-					"app.kubernetes.io/component-source-type": "git",
+				commonObjectMeta: metav1.ObjectMeta{
+					Name: "ruby",
+					Labels: map[string]string{
+						"app":                              "apptmp",
+						"app.kubernetes.io/component-name": "ruby",
+						"app.kubernetes.io/component-type": "ruby",
+						"app.kubernetes.io/name":           "apptmp",
+					},
+					Annotations: map[string]string{
+						"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
+						"app.kubernetes.io/component-source-type": "git",
+					},
 				},
 				inputPorts: []string{"8081", "9100/blah"},
 			},
@@ -1840,19 +1798,21 @@ func TestNewAppS2I(t *testing.T) {
 		{
 			name: "case 4 : with a invalid port number",
 			args: args{
-				name:         "ruby",
 				builderImage: "ruby:latest",
 				namespace:    "testing",
 				gitUrl:       "https://github.com/openshift/ruby",
-				labels: map[string]string{
-					"app": "apptmp",
-					"app.kubernetes.io/component-name": "ruby",
-					"app.kubernetes.io/component-type": "ruby",
-					"app.kubernetes.io/name":           "apptmp",
-				},
-				annotations: map[string]string{
-					"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
-					"app.kubernetes.io/component-source-type": "git",
+				commonObjectMeta: metav1.ObjectMeta{
+					Name: "ruby",
+					Labels: map[string]string{
+						"app":                              "apptmp",
+						"app.kubernetes.io/component-name": "ruby",
+						"app.kubernetes.io/component-type": "ruby",
+						"app.kubernetes.io/name":           "apptmp",
+					},
+					Annotations: map[string]string{
+						"app.kubernetes.io/url":                   "https://github.com/openshift/ruby",
+						"app.kubernetes.io/component-source-type": "git",
+					},
 				},
 				inputPorts: []string{"8ad1", "9100/Udp"},
 			},
@@ -1890,22 +1850,20 @@ func TestNewAppS2I(t *testing.T) {
 			fkclient, fkclientset := FakeNew()
 
 			fkclientset.ImageClientset.PrependReactor("list", "imagestreams", func(action ktesting.Action) (bool, runtime.Object, error) {
-				return true, fakeImageStreams(tt.args.name, tt.args.namespace), nil
+				return true, fakeImageStreams(tt.args.commonObjectMeta.Name, tt.args.commonObjectMeta.Namespace), nil
 			})
 
 			fkclientset.ImageClientset.PrependReactor("get", "imagestreams", func(action ktesting.Action) (bool, runtime.Object, error) {
-				return true, fakeImageStream(tt.args.name, tt.args.namespace, []string{"latest"}), nil
+				return true, fakeImageStream(tt.args.commonObjectMeta.Name, tt.args.commonObjectMeta.Namespace, []string{"latest"}), nil
 			})
 
 			fkclientset.ImageClientset.PrependReactor("get", "imagestreamimages", func(action ktesting.Action) (bool, runtime.Object, error) {
-				return true, fakeImageStreamImages(tt.args.name), nil
+				return true, fakeImageStreamImages(tt.args.commonObjectMeta.Name), nil
 			})
 
-			err := fkclient.NewAppS2I(tt.args.name,
+			err := fkclient.NewAppS2I(tt.args.commonObjectMeta,
 				tt.args.builderImage,
 				tt.args.gitUrl,
-				tt.args.labels,
-				tt.args.annotations,
 				tt.args.inputPorts)
 
 			if (err != nil) != tt.wantErr {
@@ -1914,23 +1872,23 @@ func TestNewAppS2I(t *testing.T) {
 
 			if err == nil {
 
-				if len(fkclientset.BuildClientset.Actions()) != 1 {
-					t.Errorf("expected 1 BuildClientset.Actions() in NewAppS2I, got: %v", fkclientset.BuildClientset.Actions())
+				if len(fkclientset.BuildClientset.Actions()) != 2 {
+					t.Errorf("expected 1 BuildClientset.Actions() in NewAppS2I, got %v: %v", len(fkclientset.BuildClientset.Actions()), fkclientset.BuildClientset.Actions())
 				}
 
 				if len(fkclientset.AppsClientset.Actions()) != 1 {
-					t.Errorf("expected 1 AppsClientset.Actions() in NewAppS2I, go: %v", fkclientset.AppsClientset.Actions())
+					t.Errorf("expected 1 AppsClientset.Actions() in NewAppS2I, got: %v", fkclientset.AppsClientset.Actions())
 				}
 
 				if len(fkclientset.Kubernetes.Actions()) != 1 {
-					t.Errorf("expected 1 Kubernetes.Actions() in NewAppS2I, go: %v", fkclientset.Kubernetes.Actions())
+					t.Errorf("expected 1 Kubernetes.Actions() in NewAppS2I, got: %v", fkclientset.Kubernetes.Actions())
 				}
 
 				var createdIS *imagev1.ImageStream
 
 				if len(tt.args.inputPorts) <= 0 {
-					if len(fkclientset.ImageClientset.Actions()) != 3 {
-						t.Errorf("expected 3 ImageClientset.Actions() in NewAppS2I, got: %v", fkclientset.ImageClientset.Actions())
+					if len(fkclientset.ImageClientset.Actions()) != 4 {
+						t.Errorf("expected 4 ImageClientset.Actions() in NewAppS2I, got %v: %v", len(fkclientset.ImageClientset.Actions()), fkclientset.ImageClientset.Actions())
 					}
 
 					// Check for imagestream objects
@@ -1944,16 +1902,16 @@ func TestNewAppS2I(t *testing.T) {
 					createdIS = fkclientset.ImageClientset.Actions()[0].(ktesting.CreateAction).GetObject().(*imagev1.ImageStream)
 				}
 
-				if createdIS.Name != tt.args.name {
-					t.Errorf("imagestream name is not matching with expected name, expected: %s, got %s", tt.args.name, createdIS.Name)
+				if createdIS.Name != tt.args.commonObjectMeta.Name {
+					t.Errorf("imagestream name is not matching with expected name, expected: %s, got %s", tt.args.commonObjectMeta.Name, createdIS.Name)
 				}
 
-				if !reflect.DeepEqual(createdIS.Labels, tt.args.labels) {
-					t.Errorf("imagestream labels not matching with expected values, expected: %s, got %s", tt.args.labels, createdIS.Labels)
+				if !reflect.DeepEqual(createdIS.Labels, tt.args.commonObjectMeta.Labels) {
+					t.Errorf("imagestream labels not matching with expected values, expected: %s, got %s", tt.args.commonObjectMeta.Labels, createdIS.Labels)
 				}
 
-				if !reflect.DeepEqual(createdIS.Annotations, tt.args.annotations) {
-					t.Errorf("imagestream annotations not matching with expected values, expected: %s, got %s", tt.args.annotations, createdIS.Annotations)
+				if !reflect.DeepEqual(createdIS.Annotations, tt.args.commonObjectMeta.Annotations) {
+					t.Errorf("imagestream annotations not matching with expected values, expected: %s, got %s", tt.args.commonObjectMeta.Annotations, createdIS.Annotations)
 				}
 
 				// Check buildconfig objects
@@ -1976,8 +1934,8 @@ func TestNewAppS2I(t *testing.T) {
 
 				// Check deploymentconfig objects
 				createdDC := fkclientset.AppsClientset.Actions()[0].(ktesting.CreateAction).GetObject().(*appsv1.DeploymentConfig)
-				if createdDC.Spec.Selector["deploymentconfig"] != tt.args.name {
-					t.Errorf("deploymentconfig name is not matching with expected value, expected: %s, got %s", tt.args.name, createdDC.Spec.Selector["deploymentconfig"])
+				if createdDC.Spec.Selector["deploymentconfig"] != tt.args.commonObjectMeta.Name {
+					t.Errorf("deploymentconfig name is not matching with expected value, expected: %s, got %s", tt.args.commonObjectMeta.Name, createdDC.Spec.Selector["deploymentconfig"])
 				}
 
 				createdSvc := fkclientset.Kubernetes.Actions()[0].(ktesting.CreateAction).GetObject().(*corev1.Service)
@@ -2628,7 +2586,7 @@ func TestCreateService(t *testing.T) {
 			commonObjectMeta: metav1.ObjectMeta{
 				Name: "nodejs",
 				Labels: map[string]string{
-					"app": "apptmp",
+					"app":                              "apptmp",
 					"app.kubernetes.io/component-name": "ruby",
 					"app.kubernetes.io/component-type": "ruby",
 					"app.kubernetes.io/name":           "apptmp",

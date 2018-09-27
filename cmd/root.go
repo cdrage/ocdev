@@ -104,7 +104,7 @@ func Execute() {
 	// before proceeding with fetching the latest version
 	cfg, err := config.New()
 	if err != nil {
-		fmt.Println("unable to fetch configuration from Odo config file.")
+		checkError(err, "")
 	}
 	if cfg.GetUpdateNotification() == true {
 		updateInfo := make(chan string)
@@ -138,6 +138,7 @@ func init() {
 	verbosity.Usage += ". Level varies from 0 to 9 (default 0)."
 
 	rootCmd.SetUsageTemplate(rootUsageTemplate)
+	flag.CommandLine.Parse([]string{})
 }
 
 func getLatestReleaseInfo(info chan<- string) {
