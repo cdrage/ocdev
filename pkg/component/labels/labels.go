@@ -13,6 +13,9 @@ const ComponentTypeLabel = "app.kubernetes.io/component-type"
 // ComponentTypeVersion is a Kubernetes label that identifies the component version
 const ComponentTypeVersion = "app.kubernetes.io/component-version"
 
+// ComponentTypeNamespace is a Kubernetes label that identifies the component namespace (for the image)
+const ComponentTypeNamespace = "app.kubernetes.io/component-namespace"
+
 // GetLabels return labels that should be applied to every object for given component in active application
 // additional labels are used only for creating object
 // if you are creating something use additional=true
