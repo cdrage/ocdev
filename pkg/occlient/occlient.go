@@ -68,7 +68,7 @@ const (
 	// Docker image that will be use containing the supervisord binary as well
 	// as the assemble / run / restart scripts
 	// TODO: Move to Quay.io before we merge (discussion release versions, etc.)
-	bootstrapperImage = "docker.io/cdrage/supervisord-test:latest"
+	bootstrapperImage = "quay.io/geoand/supervisord-test:latest"
 
 	// Create a custom name and (hope) that users don't use the *exact* same name in their deployment
 	supervisordVolumeName = "odo-supervisord-shared-data"
