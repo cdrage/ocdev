@@ -1,0 +1,29 @@
+version: v1.0
+name: Semaphore Tests
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: "Build & Test"
+    task:
+      jobs:
+      - name: Go build
+        commands:
+          - checkout
+          - make bin
+          - make validate
+          - make test
+
+  - name: "Main e2e tests"
+    task:
+      jobs:
+      - name: Main
+        commands:
+          - checkout
+          - ./scripts/oc-cluster.sh
+          - make bin
+          - sudo cp odo /usr/bin
+          - oc login -u developer
+          - make test-main-e2e

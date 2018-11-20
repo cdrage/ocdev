@@ -4,12 +4,8 @@
 ## Inspired by https://github.com/radanalyticsio/oshinko-cli/blob/master/.travis.yml
 
 sudo service docker stop
-
-sudo sed -i -e 's/sock/sock --insecure-registry 172.30.0.0\/16/' /etc/default/docker
-sudo cat /etc/default/docker
-
+echo "DOCKER_OPTS=\"--insecure-registry 172.30.0.0/16\"" | sudo tee -a /etc/default/docker
 sudo service docker start
-sudo service docker status
 
 ## download oc binaries
 sudo wget https://github.com/openshift/origin/releases/download/v3.10.0/openshift-origin-client-tools-v3.10.0-dd10d17-linux-64bit.tar.gz -O /tmp/openshift-origin-client-tools.tar.gz 2> /dev/null > /dev/null
