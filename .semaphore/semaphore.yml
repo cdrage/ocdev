@@ -8,6 +8,7 @@ agent:
 blocks:
   - name: "Build, Validate & Test"
     task:
+
       prologue:
         commands:
           - sem-version go 1.11
@@ -30,6 +31,7 @@ blocks:
 
   - name: "End-to-End Tests"
     task:
+
       prologue:
         commands:
           - sem-version go 1.11
