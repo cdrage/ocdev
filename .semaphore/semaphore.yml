@@ -1,0 +1,37 @@
+version: v1.0
+name: Semaphore Tests
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: "Build & Test"
+    task:
+      prologue:
+        commands:
+          - sem-version go 1.11
+          - export "SEMAPHORE_GIT_DIR=$(go env GOPATH)/src/github.com/redhat-developer/${SEMAPHORE_PROJECT_NAME}"
+          - export "PATH=$(go env GOPATH)/bin:${PATH}"
+          - mkdir -vp "${SEMAPHORE_GIT_DIR}" "$(go env GOPATH)/bin"
+
+      jobs:
+      - name: Go build
+        commands:
+          - checkout
+          - make goget-tools
+          - make bin
+          - sudo cp odo /usr/bin
+          - make validate
+          - make test
+
+  - name: "Main e2e tests"
+    task:
+      jobs:
+      - name: Main
+        commands:
+          - checkout
+          - ./scripts/semaphore.sh
+          - ./scripts/oc-cluster.sh
+          - oc login -u developer
+          - make test-main-e2e
