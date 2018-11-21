@@ -6,7 +6,7 @@ agent:
     os_image: ubuntu1804
 
 blocks:
-  - name: "Build & Test"
+  - name: "Build, Validate & Test"
     task:
       prologue:
         commands:
@@ -14,24 +14,37 @@ blocks:
           - export "SEMAPHORE_GIT_DIR=$(go env GOPATH)/src/github.com/redhat-developer/${SEMAPHORE_PROJECT_NAME}"
           - export "PATH=$(go env GOPATH)/bin:${PATH}"
           - mkdir -vp "${SEMAPHORE_GIT_DIR}" "$(go env GOPATH)/bin"
-
-      jobs:
-      - name: Go build
-        commands:
           - checkout
           - make goget-tools
           - make bin
           - sudo cp odo /usr/bin
-          - make validate
-          - make test
 
-  - name: "Main e2e tests"
-    task:
       jobs:
-      - name: Main
+      - name: Validate
         commands:
+          - make validate
+
+      - name: Test
+        commands:
+          - make validate
+
+  - name: "End-to-End Tests"
+    task:
+      prologue:
+        commands:
+          - sem-version go 1.11
+          - export "SEMAPHORE_GIT_DIR=$(go env GOPATH)/src/github.com/redhat-developer/${SEMAPHORE_PROJECT_NAME}"
+          - export "PATH=$(go env GOPATH)/bin:${PATH}"
+          - mkdir -vp "${SEMAPHORE_GIT_DIR}" "$(go env GOPATH)/bin"
           - checkout
+          - make goget-tools
+          - make bin
+          - sudo cp odo /usr/bin
           - ./scripts/semaphore.sh
           - ./scripts/oc-cluster.sh
           - oc login -u developer
+
+      jobs:
+      - name: Main
+        commands:
           - make test-main-e2e
