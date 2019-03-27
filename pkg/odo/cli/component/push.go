@@ -3,10 +3,8 @@ package component
 import (
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/fatih/color"
 	"github.com/golang/glog"
@@ -17,6 +15,7 @@ import (
 	"github.com/openshift/odo/pkg/config"
 	"github.com/openshift/odo/pkg/log"
 	"github.com/openshift/odo/pkg/occlient"
+	"github.com/openshift/odo/pkg/odo/cli/utils"
 	"github.com/openshift/odo/pkg/odo/genericclioptions"
 	"github.com/openshift/odo/pkg/odo/util/completion"
 	"github.com/openshift/odo/pkg/project"
@@ -47,8 +46,9 @@ type PushOptions struct {
 	sourcePath       string
 	localConfig      *config.LocalConfigInfo
 	componentContext string
+	client           *occlient.Client
+
 	*genericclioptions.Context
-	client *occlient.Client
 }
 
 // NewPushOptions returns new instance of PushOptions
@@ -63,36 +63,22 @@ func NewPushOptions() *PushOptions {
 func (po *PushOptions) Complete(name string, cmd *cobra.Command, args []string) (err error) {
 	po.client = genericclioptions.Client(cmd)
 
-	conf, err := config.NewLocalConfigInfo(po.componentContext)
+	// Retrieve configuration configuration
+	conf, err := utils.RetrieveLocalConfigInfo(po.componentContext)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch component config")
+		return errors.Wrap(err, "unable to retrieve config information")
 	}
-	po.localConfig = conf
+	po.localConfig = conf.LocalConfig
+	po.sourcePath = conf.SourcePath
+	po.sourceType = conf.LocalConfig.GetSourceType()
 
-	po.sourceType = po.localConfig.GetSourceType()
-	po.sourcePath = po.localConfig.GetSourceLocation()
-
-	cmpName := po.localConfig.GetName()
-
-	if po.sourceType == config.BINARY || po.sourceType == config.LOCAL {
-		u, err := url.Parse(po.sourcePath)
-		if err != nil {
-			return errors.Wrapf(err, "unable to parse source %s from component %s", po.sourcePath, cmpName)
-		}
-
-		if u.Scheme != "" && u.Scheme != "file" {
-			return fmt.Errorf("Component %s has invalid source path %s", cmpName, u.Scheme)
-		}
-		po.sourcePath = util.ReadFilePath(u, runtime.GOOS)
+	// Apply ignore information
+	err = utils.ApplyIgnore(&po.ignores, po.sourcePath)
+	if err != nil {
+		return errors.Wrap(err, "unable to apply ignore information")
 	}
 
-	if len(po.ignores) == 0 {
-		rules, err := util.GetIgnoreRulesFromDirectory(po.sourcePath)
-		if err != nil {
-			odoutil.LogErrorAndExit(err, "")
-		}
-		po.ignores = append(po.ignores, rules...)
-	}
+	// Set the correct context
 	po.Context = genericclioptions.NewContextCreatingAppIfNeeded(cmd)
 	return
 }

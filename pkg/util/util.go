@@ -399,6 +399,7 @@ func GetHostWithPort(inputURL string) (string, error) {
 // directory is the name of the directory to look into for either of the files
 // rules is the array of rules (in string form)
 func GetIgnoreRulesFromDirectory(directory string) ([]string, error) {
+
 	rules := []string{".git"}
 	// checking for presence of .odoignore file
 	pathIgnore := path.Join(directory, ".odoignore")
