@@ -2,7 +2,7 @@ package completion
 
 import (
 	"github.com/openshift/odo/pkg/odo/genericclioptions"
-	"github.com/posener/complete"
+	"github.com/cdrage/complete"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 )
@@ -22,7 +22,7 @@ type handlerKey struct {
 
 // parsedArgs provides easier to deal with information about what the command line looks like during a completion call
 type parsedArgs struct {
-	// original records the original arguments provided by posener/complete
+	// original records the original arguments provided by cdrage/complete
 	original complete.Args
 	// typed returns what the user typed minus the command triggering the completion
 	typed []string
@@ -38,7 +38,7 @@ type contextLoader func(command *cobra.Command) *genericclioptions.Context
 // specified client to resolve the entities to be completed
 type ContextualizedPredictor func(cmd *cobra.Command, args parsedArgs, context *genericclioptions.Context) []string
 
-// Predict is called by the posener/complete code when the shell asks for completion of a given argument
+// Predict is called by the cdrage/complete code when the shell asks for completion of a given argument
 func (ch completionHandler) Predict(args complete.Args) []string {
 	return ch.predictor(ch.cmd, NewParsedArgs(args, ch.cmd), ch.ctxLoader(ch.cmd))
 }

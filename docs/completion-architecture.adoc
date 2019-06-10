@@ -5,8 +5,8 @@ how to activate/deactivate completions for `odo`.
 
 == Architecture
 
-The completion architecture relies on the https://github.com/posener/complete[`posener/complete`] project.
-`posener/complete` relies on providing implementations of their `Predictor` interface:
+The completion architecture relies on the https://github.com/cdrage/complete[`cdrage/complete`] project.
+`cdrage/complete` relies on providing implementations of their `Predictor` interface:
 
 [source,go]
 ----
@@ -19,7 +19,7 @@ These implementations are then bound to a `complete.Command` which describes how
 it is possible to create an external application simply for the purpose of providing completions, it made more sense for `odo` to have `odo`itself deal with exposing possible completions. In this case, we need to hook into the `cobra` command lifecycle and expose completion information before `cobra` takes over. This happens in the main entry point for the `odo` application. Completion information is provided by the `createCompletion` function which walks the `cobra` command tree and creates the `complete.Command` tree as it goes along, attaching completion handler to commands (for arguments) and flags.
 
 In order to provide this information, `odo` allows commands to register completion handlers for their arguments and flags using `completion.RegisterCommandHandler` and
-`completion.RegisterCommandFlagHandler` respectively. These functions will adapt the contextualized predictor that we expose to commands to the `posener/complete` `Predictor` interface internally.
+`completion.RegisterCommandFlagHandler` respectively. These functions will adapt the contextualized predictor that we expose to commands to the `cdrage/complete` `Predictor` interface internally.
 
 == Create a new completion handler
 
@@ -33,7 +33,7 @@ which is a function which should return an array of possible completion strings 
 
 This function should be put in `pkg/odo/util/completion/completionhandlers.go` so that it could be reused across commands.
 
-While filtering is done by `posener/complete` itself, automatically removing all completions not prefixed by what you’ve typed already, it might be useful to use the values provided by `parsedArgs` to help optimize things to avoid repeating possible completions for example.
+While filtering is done by `cdrage/complete` itself, automatically removing all completions not prefixed by what you’ve typed already, it might be useful to use the values provided by `parsedArgs` to help optimize things to avoid repeating possible completions for example.
 
 == Register the completion handler
 

@@ -1,5 +1,5 @@
-hash: 9609a0d65ff7c6c3e7c5a70aa1f46aaffe4229aa698db538ea82d8f2de88e6a9
-updated: 2019-03-28T15:05:18.897257+01:00
+hash: 32a9e0e7a037516aa94e46da29d114c6ad97d65c2a20a0529d141d83a48ec9fa
+updated: 2019-06-10T15:28:18.28826759-04:00
 imports:
 - name: github.com/alexbrainman/sspi
   version: e580b900e9f5657daa5473021296289be6da2661
@@ -19,6 +19,12 @@ imports:
   - quantile
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
+- name: github.com/cdrage/complete
+  version: 7b5e38708e14af7491e0083fd9b62dd5449436c7
+  subpackages:
+  - cmd
+  - cmd/install
+  - match
 - name: github.com/certifi/gocertifi
   version: deb3ae2ef2610fde3330947281941c562861188b
 - name: github.com/davecgh/go-spew
@@ -149,7 +155,7 @@ imports:
 - name: github.com/kballard/go-shellquote
   version: 95032a82bc518f77982ea72343cc1ade730072f0
 - name: github.com/kr/pty
-  version: 521317be5ebc228a0f0ede099fa2a0b5ece22e49
+  version: b6e1bdd4a4f88614e0c6e5e8089c7abed98aae17
 - name: github.com/kubernetes-incubator/service-catalog
   version: 9d82b390b96d565e9301fdfe4ac822311e765a3c
   subpackages:
@@ -176,7 +182,7 @@ imports:
 - name: github.com/mattn/go-colorable
   version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
 - name: github.com/mattn/go-isatty
-  version: c2a7a6ca930a4cd0bc33a3f298eb71960732a3a7
+  version: 1311e847b0cb909da63b5fecfb5370aa66236465
 - name: github.com/mattn/go-runewidth
   version: 703b5e6b11ae25aeb2af9ebb5d5fdf8fa2575211
 - name: github.com/matttproud/golang_protobuf_extensions
@@ -300,6 +306,7 @@ imports:
   - pkg/api/legacy
   - pkg/apps/apis/apps
   - pkg/apps/apis/apps/v1
+  - pkg/apps/util
   - pkg/authorization/apis/authorization
   - pkg/authorization/apis/authorization/install
   - pkg/authorization/apis/authorization/internal/serviceaccount
@@ -370,12 +377,6 @@ imports:
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
-- name: github.com/posener/complete
-  version: dcda3199365ca2a5f24aea4c42aa56f6a197d117
-  subpackages:
-  - cmd
-  - cmd/install
-  - match
 - name: github.com/prometheus/client_golang
   version: e7e903064f5e9eb5da98208bae10b475d4db0f8c
   subpackages:
@@ -526,12 +527,12 @@ imports:
   - storage/v1alpha1
   - storage/v1beta1
 - name: k8s.io/apiextensions-apiserver
-  version: 45cb0b8537cf79d23914721e0bf41a3479769b22
+  version: b7d0e2b1627b294a279e353457bc2dca5bf24204
   repo: https://github.com/openshift/kubernetes-apiextensions-apiserver.git
   subpackages:
   - pkg/features
 - name: k8s.io/apimachinery
-  version: 5f1ab6ad9104144e43c7e477938fd278ade27eb2
+  version: 74ddc303230987512c5e02a79c0daaf253f02cd1
   repo: https://github.com/openshift/kubernetes-apimachinery.git
   subpackages:
   - pkg/api/equality
@@ -588,7 +589,7 @@ imports:
   - third_party/forked/golang/netutil
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
-  version: 996cefeb14170756dc1626dde64fcfb63c8edb24
+  version: 174ebe84d194f2aa09828ecf26a7a373e408c579
   repo: https://github.com/openshift/kubernetes-apiserver.git
   subpackages:
   - pkg/apis/audit
@@ -601,7 +602,7 @@ imports:
   - pkg/features
   - pkg/util/feature
 - name: k8s.io/client-go
-  version: 7eaf7133bcfa11e19ebbbc76ff53e2cb32524683
+  version: 4e713fcf4a6f160c496b230586d790d5aba0ba9b
   repo: https://github.com/openshift/kubernetes-client-go.git
   subpackages:
   - discovery
@@ -717,7 +718,7 @@ imports:
   - pkg/util/proto
   - pkg/util/proto/validation
 - name: k8s.io/kubernetes
-  version: d8b46d72a413981e6ea99605dcef3b8ca3f2223f
+  version: ""
   repo: https://github.com/openshift/kubernetes.git
   subpackages:
   - pkg/api/events

@@ -15,7 +15,7 @@ import (
 	"github.com/openshift/odo/pkg/storage"
 	"github.com/openshift/odo/pkg/url"
 	"github.com/openshift/odo/pkg/util"
-	"github.com/posener/complete"
+	"github.com/cdrage/complete"
 	"github.com/spf13/cobra"
 )
 
