@@ -184,7 +184,7 @@ func (co *CreateOptions) setComponentName(args []string) (err error) {
 		return errors.Wrap(err, "component type is mandatory parameter to generate a default component name")
 	}
 
-	componentName, err := createDefaultComponentName(
+	componentName, err := getDefaultComponentName(
 		co.Context,
 		componentType,
 		*(co.componentSettings.SourceType),
@@ -215,8 +215,8 @@ func getSourceLocation(componentContext string, currentDirectory string) (string
 	return sourceLocation, nil
 }
 
-func createDefaultComponentName(context *genericclioptions.Context, componentType string, sourceType config.SrcType, sourcePath string) (string, error) {
-	// Retrieve the componentName, if the componentName isn't specified, we will use the default image name
+// getDefaultComponentName retrieves the componentName, if the componentName isn't specified, we will use the default image name
+func getDefaultComponentName(context *genericclioptions.Context, componentType string, sourceType config.SrcType, sourcePath string) (string, error) {
 	componentName, err := component.GetDefaultComponentName(
 		sourcePath,
 		sourceType,
@@ -337,7 +337,7 @@ func (co *CreateOptions) Complete(name string, cmd *cobra.Command, args []string
 
 		}
 
-		defaultComponentName, err := createDefaultComponentName(co.Context, selectedComponentType, selectedSourceType, selectedSourcePath)
+		defaultComponentName, err := getDefaultComponentName(co.Context, selectedComponentType, selectedSourceType, selectedSourcePath)
 		if err != nil {
 			return err
 		}
