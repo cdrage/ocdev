@@ -256,6 +256,19 @@ func IsDebug() bool {
 	return false
 }
 
+// IsJSON returns true if the --output paramter has been passed
+func IsJSON() bool {
+
+	flag := pflag.Lookup("output")
+
+	if flag != nil {
+		fmt.Println("It's json!")
+		return !strings.Contains(pflag.Lookup("output").Value.String(), "json")
+	}
+
+	return false
+}
+
 // GetStdout gets the appropriate stdout from the OS. If it's Linux, it will use
 // the go-colorable library in order to fix any and all color ASCII issues.
 // TODO: Test needs to be added once we get Windows testing available on TravisCI / CI platform.
