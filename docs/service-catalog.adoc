@@ -1,0 +1,16 @@
+
+
+
+[source,bash]
+----
+odo catalog list services
+git clone https://github.com/openshift/nodejs-ex
+odo create
+odo push
+
+# Use mongodb
+odo service create
+
+cd nodejs-ex
+odo link theserviceyoumade..
+----
