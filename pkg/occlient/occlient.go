@@ -104,8 +104,8 @@ const (
 	// Create a custom name and (hope) that users don't use the *exact* same name in their deployment
 	supervisordVolumeName = "odo-supervisord-shared-data"
 
-	// waitForPodTimeOut controls how long we should wait for a pod before giving up
-	waitForPodTimeOut = 240 * time.Second
+	// defaultPodTimeout controls how long we should wait for a pod before giving up
+	defaultPodTimeout = 240 * time.Second
 
 	// ComponentPortAnnotationName annotation is used on the secrets that are created for each exposed port of the component
 	ComponentPortAnnotationName = "component-port"
@@ -439,14 +439,17 @@ func (c *Client) RunLogout(stdout io.Writer) error {
 // isServerUp returns true if server is up and running
 // server parameter has to be a valid url
 func isServerUp(server string) bool {
+
 	// initialising the default timeout, this will be used
 	// when the value is not readable from config
 	ocRequestTimeout := preference.DefaultTimeout * time.Second
+
 	// checking the value of timeout in config
 	// before proceeding with default timeout
-	cfg, configReadErr := preference.New()
-	if configReadErr != nil {
-		glog.V(4).Info(errors.Wrap(configReadErr, "unable to read config file"))
+	// NOTE: Isn't this NEVER loaded if you're outside of the context directy??
+	cfg, err := preference.New()
+	if err != nil {
+		glog.V(4).Info(errors.Wrap(err, "unable to read config file"))
 	} else {
 		ocRequestTimeout = time.Duration(cfg.GetTimeout()) * time.Second
 	}
@@ -1742,6 +1745,15 @@ func (c *Client) WaitAndGetDC(name string, desiredRevision int64, timeout time.D
 // WaitAndGetPod block and waits until pod matching selector is in in Running state
 // desiredPhase cannot be PodFailed or PodUnknown
 func (c *Client) WaitAndGetPod(selector string, desiredPhase corev1.PodPhase, waitMessage string) (*corev1.Pod, error) {
+
+	// Get the local configuration in order to retreive the default pushTimeout in config.
+	cfg, err := config.New()
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to retrieve configuration file")
+	}
+	pushTimeout := cfg.GetPushTimeout()
+	glog.V(4).Infof("Will timeout after %v seconds", pushTimeout)
+
 	glog.V(4).Infof("Waiting for %s pod", selector)
 	s := log.Spinner(waitMessage)
 	defer s.End(false)
@@ -1791,8 +1803,8 @@ func (c *Client) WaitAndGetPod(selector string, desiredPhase corev1.PodPhase, wa
 		return val, nil
 	case err := <-watchErrorChannel:
 		return nil, err
-	case <-time.After(waitForPodTimeOut):
-		return nil, errors.Errorf("waited %s but couldn't find running pod matching selector: '%s'", waitForPodTimeOut, selector)
+	case <-time.After(time.Duration(pushTimeout) * time.Second):
+		return nil, errors.Errorf("waited %v but couldn't find running pod matching selector: '%s'", pushTimeout, selector)
 	}
 }
 

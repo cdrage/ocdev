@@ -21,8 +21,12 @@ const (
 	configFileName        = "config.yaml"
 	localConfigKind       = "LocalConfig"
 	localConfigAPIVersion = "odo.openshift.io/v1alpha1"
+
 	// DefaultDebugPort is the default port used for debugging on remote pod
 	DefaultDebugPort = 5858
+
+	// DefaultPushTimeout is the default timeout used (in seconds)
+	DefaultPushTimeout = 240
 )
 
 type ComponentStorageSettings struct {
@@ -55,6 +59,8 @@ type ComponentSettings struct {
 	Project *string `yaml:"Project,omitempty"`
 
 	Name *string `yaml:"Name,omitempty"`
+
+	PushTimeout *int `yaml:"PushTimeout,omitempty"`
 
 	MinMemory *string `yaml:"MinMemory,omitempty"`
 
@@ -211,6 +217,12 @@ func (lci *LocalConfigInfo) SetConfiguration(parameter string, value interface{}
 			lci.componentSettings.Ports = &arrValue
 		case "name":
 			lci.componentSettings.Name = &strValue
+		case "pushtimeout":
+			pushTimeout, err := strconv.Atoi(strValue)
+			if err != nil {
+				return err
+			}
+			lci.componentSettings.PushTimeout = &pushTimeout
 		case "minmemory":
 			lci.componentSettings.MinMemory = &strValue
 		case "maxmemory":
@@ -449,6 +461,14 @@ func (lc *LocalConfig) GetMaxMemory() string {
 	return *lc.componentSettings.MaxMemory
 }
 
+// GetPushTimeout returns the PushTimeout, returns default if nil
+func (lc *LocalConfig) GetPushTimeout() int {
+	if lc.componentSettings.PushTimeout == nil {
+		return DefaultPushTimeout
+	}
+	return *lc.componentSettings.PushTimeout
+}
+
 // GetDebugPort returns the DebugPort, returns default if nil
 func (lc *LocalConfig) GetDebugPort() int {
 	if lc.componentSettings.DebugPort == nil {
@@ -514,6 +534,10 @@ const (
 	Name = "Name"
 	// NameDescription is human-readable description of the Name setting
 	NameDescription = "The name of the component"
+	// PushTimeout is the name of the setting that controls how long until we timeout when pushing a compoennt
+	PushTimeout = "PushTimeout"
+	// PushTimeoutDescription describes what the PushTimeout config setting does
+	PushTimeoutDescription = "The max amount of time to wait beforing timing out a push"
 	// MinMemory is the name of the setting controlling the min memory a component consumes
 	MinMemory = "MinMemory"
 	// MinMemoryDescription is the description of the setting controlling the minimum memory
@@ -590,6 +614,7 @@ var (
 		SourceType:     SourceTypeDescription,
 		Ref:            RefDescription,
 		Ports:          PortsDescription,
+		PushTimeout:    PushTimeoutDescription,
 		MinMemory:      MinMemoryDescription,
 		MaxMemory:      MaxMemoryDescription,
 		Memory:         MemoryDescription,
