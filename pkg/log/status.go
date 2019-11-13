@@ -108,6 +108,22 @@ func IsTerminal(w io.Writer) bool {
 	return false
 }
 
+// UpdateStatus ...
+func (s *Status) UpdateStatus(status string) {
+	oldStatus := fmt.Sprintf(suffixSpacing+"%s", s.status)
+	s.status = status
+	newStatus := fmt.Sprintf(suffixSpacing+"%s", s.status)
+
+	// If the previous suffix is longer than the new one we require to add spacing to the end in order to
+	// "clear" the line..
+
+	if len(oldStatus) > len(newStatus) {
+		s.status = rightPad(newStatus, " ", len(oldStatus)-len(newStatus))
+	}
+
+	s.spinner.SetSuffix(fmt.Sprintf(suffixSpacing+"%s", s.status))
+}
+
 // Start starts a new phase of the status, if attached to a terminal
 // there will be a loading spinner with this status
 func (s *Status) Start(status string, debug bool) {
@@ -375,4 +391,8 @@ func getSpacingString() string {
 		return "-"
 	}
 	return "•"
+}
+
+func rightPad(s string, padStr string, pLen int) string {
+	return s + strings.Repeat(padStr, pLen)
 }

@@ -1757,6 +1757,12 @@ func (c *Client) WaitAndGetPod(selector string, desiredPhase corev1.PodPhase, wa
 	podChannel := make(chan *corev1.Pod)
 	watchErrorChannel := make(chan error)
 
+	/*
+
+		TODO: CHECK FOR PVC! Make sure it'sdeployed too.. Investigate WHAT in the pod isn't deployed yet and output it to the user..
+
+	*/
+
 	go func() {
 	loop:
 		for {
@@ -1766,7 +1772,11 @@ func (c *Client) WaitAndGetPod(selector string, desiredPhase corev1.PodPhase, wa
 				break loop
 			}
 			if e, ok := val.Object.(*corev1.Pod); ok {
-				glog.V(4).Infof("Status of %s pod is %s", e.Name, e.Status.Phase)
+				select {
+				case <-time.After(1):
+					s.UpdateStatus("This is taking a while!")
+				}
+
 				switch e.Status.Phase {
 				case desiredPhase:
 					s.End(true)
