@@ -68,3 +68,4 @@ import:
   version: v1.2.2
 - package: github.com/xeipuuv/gojsonschema
   version: v1.2.0
+- package: k8s.io/kubectl/pkg/cmd/exec
