@@ -270,7 +270,7 @@ func (co *CreateOptions) Complete(name string, cmd *cobra.Command, args []string
 		co.interactive = true
 	}
 
-	co.LocalConfigInfo, err = config.NewLocalConfigInfo(co.componentContext)
+	err = co.InitConfigFromContext()
 	if err != nil {
 		return errors.Wrap(err, "failed intiating local config")
 	}
@@ -481,11 +481,15 @@ func (co *CreateOptions) Run() (err error) {
 		return errors.Wrapf(err, "failed to persist the component settings to config file")
 	}
 	if co.now {
-		co.Context, co.LocalConfigInfo, err = genericclioptions.UpdatedContext(co.Context)
 
+		localConfig := &config.LocalConfigInfo{}
+		co.Context, localConfig, err = genericclioptions.UpdatedContext(co.Context)
 		if err != nil {
 			return errors.Wrap(err, "unable to retrieve updated local config")
 		}
+
+		co.LocalConfigInfo = *localConfig
+
 		err = co.SetSourceInfo()
 		if err != nil {
 			return errors.Wrap(err, "unable to set source information")
@@ -510,7 +514,7 @@ func (co *CreateOptions) Run() (err error) {
 				return err
 			}
 		} else {
-			componentDesc, err = component.GetComponentFromConfig(*co.LocalConfigInfo)
+			componentDesc, err = component.GetComponentFromConfig(co.LocalConfigInfo)
 			if err != nil {
 				return err
 			}

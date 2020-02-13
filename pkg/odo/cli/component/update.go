@@ -58,10 +58,12 @@ func NewUpdateOptions() *UpdateOptions {
 // Complete completes update args
 func (uo *UpdateOptions) Complete(name string, cmd *cobra.Command, args []string) (err error) {
 	uo.Context = genericclioptions.NewContext(cmd)
-	uo.LocalConfigInfo, err = config.NewLocalConfigInfo(uo.componentContext)
+	localConfig, err := config.NewLocalConfigInfo(uo.componentContext)
 	if err != nil {
 		return errors.Wrapf(err, "failed to update component")
 	}
+
+	uo.LocalConfigInfo = *localConfig
 
 	return
 }

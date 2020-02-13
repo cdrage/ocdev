@@ -28,7 +28,6 @@ type CommonPushOptions struct {
 	sourceType       config.SrcType
 	sourcePath       string
 	componentContext string
-	LocalConfigInfo  *config.LocalConfigInfo
 
 	pushConfig         bool
 	pushSource         bool
@@ -48,10 +47,11 @@ func NewCommonPushOptions() *CommonPushOptions {
 //InitConfigFromContext initializes localconfiginfo from the context
 func (cpo *CommonPushOptions) InitConfigFromContext() error {
 	var err error
-	cpo.LocalConfigInfo, err = config.NewLocalConfigInfo(cpo.componentContext)
+	localConfig, err := config.NewLocalConfigInfo(cpo.componentContext)
 	if err != nil {
 		return err
 	}
+	cpo.LocalConfigInfo = *localConfig
 	return nil
 }
 
@@ -105,7 +105,7 @@ func (cpo *CommonPushOptions) createCmpIfNotExistsAndApplyCmpConfig(stdout io.Wr
 	if !cpo.doesComponentExist {
 
 		// Classic case of component creation
-		if err := component.CreateComponent(cpo.Context.Client, *cpo.LocalConfigInfo, cpo.componentContext, stdout); err != nil {
+		if err := component.CreateComponent(cpo.Context.Client, cpo.LocalConfigInfo, cpo.componentContext, stdout); err != nil {
 			log.Errorf(
 				"Failed to create component with name %s. Please use `odo config view` to view settings used to create component. Error: %v",
 				cmpName,
@@ -116,7 +116,7 @@ func (cpo *CommonPushOptions) createCmpIfNotExistsAndApplyCmpConfig(stdout io.Wr
 	}
 
 	// Apply config
-	err := component.ApplyConfig(cpo.Context.Client, *cpo.LocalConfigInfo, stdout, cpo.doesComponentExist)
+	err := component.ApplyConfig(cpo.Context.Client, cpo.LocalConfigInfo, stdout, cpo.doesComponentExist)
 	if err != nil {
 		odoutil.LogErrorAndExit(err, "Failed to update config to component deployed.")
 	}

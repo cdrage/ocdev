@@ -50,7 +50,7 @@ func (po *PushOptions) Complete(name string, cmd *cobra.Command, args []string) 
 	}
 
 	// Set the necessary values within WatchOptions
-	po.LocalConfigInfo = conf
+	po.LocalConfigInfo = *conf
 	err = po.SetSourceInfo()
 	if err != nil {
 		return errors.Wrap(err, "unable to set source information")
