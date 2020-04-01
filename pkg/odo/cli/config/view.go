@@ -9,6 +9,7 @@ import (
 
 	"github.com/openshift/odo/pkg/config"
 	"github.com/openshift/odo/pkg/odo/genericclioptions"
+	"github.com/openshift/odo/pkg/odo/util/experimental"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	ktemplates "k8s.io/kubernetes/pkg/kubectl/util/templates"
@@ -45,7 +46,14 @@ func (o *ViewOptions) Complete(name string, cmd *cobra.Command, args []string) (
 
 // Validate validates the ViewOptions based on completed values
 func (o *ViewOptions) Validate() (err error) {
-	if !o.lci.ConfigFileExists() {
+
+	// There are "two" configurations. One is Devfile, the other is Service Catalog / S2I / the other implementation that we have.
+
+	// First, we check to see if we are in experimental mode or not (if we aren't, just return nil)
+	if experimental.IsExperimentalModeEnabled() {
+		// TODO: ADD VALIDATION FOR DEVFILE?
+		return
+	} else if !o.lci.ConfigFileExists() {
 		return errors.New("the directory doesn't contain a component. Use 'odo create' to create a component")
 	}
 	return
