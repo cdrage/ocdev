@@ -110,20 +110,26 @@ func GetSupportedComponents(data data.DevfileData) []common.DevfileComponent {
 }
 
 // GetVolumes iterates through the components in the devfile and returns a map of component alias to the devfile volumes
-func GetVolumes(devfileObj devfileParser.DevfileObj) map[string][]DevfileVolume {
-	// componentAliasToVolumes is a map of the Devfile Component Alias to the Devfile Component Volumes
-	componentAliasToVolumes := make(map[string][]DevfileVolume)
+func GetVolumes(devfileObj devfileParser.DevfileObj) []ComponentVolumesPair {
+	// componentAliasToVolumes maps the Devfile Component Alias to the Devfile Component Volumes
+	componentAliasToVolumes := []ComponentVolumesPair{}
 	size := volumeSize
 	for _, comp := range GetSupportedComponents(devfileObj.Data) {
 		if len(comp.Container.VolumeMounts) != 0 {
+			volumes := []DevfileVolume{}
 			for _, volume := range comp.Container.VolumeMounts {
 				vol := DevfileVolume{
 					Name:          volume.Name,
 					ContainerPath: volume.Path,
 					Size:          size,
 				}
-				componentAliasToVolumes[comp.Container.Name] = append(componentAliasToVolumes[comp.Container.Name], vol)
+				volumes = append(volumes, vol)
 			}
+			volumeData := ComponentVolumesPair{
+				ComponentAlias: *comp.Alias,
+				Volumes:        volumes,
+			}
+			componentAliasToVolumes = append(componentAliasToVolumes, volumeData)
 		}
 	}
 	return componentAliasToVolumes
